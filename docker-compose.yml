@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgrespassword
+  go-backend:
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      DB_POSTGRES_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
+      SECRET: 3EK6FD+o0+c7tzBNVfjpMkNDi2yARAAKzQlk8O2IKoxQu4nF7EdAh8s3TwpHwrdWT6R
+      TOKEN_EXPIRATION: 600
+    depends_on:
+      - postgres
+volumes:
+  db_data:
