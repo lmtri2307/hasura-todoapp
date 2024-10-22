@@ -6,6 +6,11 @@ services:
       - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgrespassword
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   go-backend:
     build: ./go-backend
     ports:
@@ -15,7 +20,8 @@ services:
       SECRET: 3EK6FD+o0+c7tzBNVfjpMkNDi2yARAAKzQlk8O2IKoxQu4nF7EdAh8s3TwpHwrdWT6R
       TOKEN_EXPIRATION: 600
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
   graphql-engine-cli:
     image: hasura/graphql-engine:v2.42.0.cli-migrations-v3
     volumes:
@@ -35,8 +41,9 @@ services:
       GO_BACKEND: http://go-backend:3000
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
     depends_on:
-      - postgres
-      - go-backend
-
+      go-backend:
+        condition: service_started
+      postgres:
+        condition: service_healthy
 volumes:
   db_data:
