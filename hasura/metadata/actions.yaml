@@ -1,0 +1,66 @@
+actions:
+  - name: login
+    definition:
+      kind: synchronous
+      handler: '{{GO_BACKEND}}/auth'
+      request_transform:
+        body:
+          action: transform
+          template: |-
+            {
+              "username": {{$body.input.params.username}},
+              "password": {{$body.input.params.password}}
+            }
+        template_engine: Kriti
+        version: 2
+      response_transform:
+        body:
+          action: transform
+          template: |-
+            {
+              "accessToken": {{$body.data?.accessToken}},
+              "message": {{$body.error}}
+            }
+        template_engine: Kriti
+        version: 2
+    permissions:
+      - role: user
+    comment: login user
+  - name: register
+    definition:
+      kind: synchronous
+      handler: '{{GO_BACKEND}}/users'
+      request_transform:
+        body:
+          action: transform
+          template: |-
+            {
+              "username": {{$body.input.params.username}},
+              "password": {{$body.input.params.password}}
+            }
+        template_engine: Kriti
+        version: 2
+      response_transform:
+        body:
+          action: transform
+          template: |-
+            {
+              "username": {{$body.data?.username}},
+              "message": {{$body.error}}
+            }
+        template_engine: Kriti
+        version: 2
+    permissions:
+      - role: user
+    comment: register user
+custom_types:
+  enums: []
+  input_objects:
+    - name: RegisterRequest
+    - name: LoginRequest
+  objects:
+    - name: RegisterResponseData
+    - name: RegisterResponse
+    - name: LoginResponseData
+    - name: LoginResponse
+  scalars: []
